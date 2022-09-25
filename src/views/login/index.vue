@@ -63,22 +63,30 @@
     mounted () {},
     methods: {
         async onSubmit () {
-    // 1.获取表单数据
-        const user = this.user
-    //TODO 2.表单验证
+            // 1.获取表单数据
+            const user = this.user
+            //TODO 2.表单验证
 
-    //3.提交表单请求登录
-        try {
-            const res = await login(user)
-            console.log('登陆成功',res)
-        } catch (err) {
-            if (err.response.status === 400) {
-                console.log('手机号或验证码错误')
-            } else {
-                console.log('登录失败，请稍后重试')
+            //在组件中必须通过 this.$toast 来调用 Toast 组件
+            this.$toast.loading({
+                message: '登录中...', 
+                forbidClick: true, //禁用背景点击
+                duration:0 //持续时间，默认是2000
+            });
+
+            //3.提交表单请求登录
+            try {
+                const res = await login(user)
+                console.log('登陆成功',res)
+                this.$toast.success('登录成功') //toast有覆盖
+            } catch (err) {
+                if (err.response.status === 400) {
+                    this.$toast.fail('手机号或验证码错误')
+                } else {
+                    this.$toast.fail('登录失败，请稍后重试')
+                }
             }
-        }
-    // 4.请求响应结果后续操作
+            // 4.请求响应结果后续操作
      }
      }
     }
