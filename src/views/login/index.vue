@@ -12,10 +12,10 @@
            如果验证通过，会触发 submit 事件
            如果验证失败，不会触发 submit
      -->
-    <van-form @submit="onSubmit">
+    <van-form ref="loginForm" @submit="onSubmit">
         <van-field
         v-model="user.mobile"
-        name="⽤户名"
+        name="mobile"
         placeholder="请输⼊⼿机号"
         :rules="userFormRules.mobile"
         type="number"
@@ -25,7 +25,7 @@
         </van-field>
         <van-field
         v-model="user.code"
-        name="验证码"
+        name="code"
         placeholder="请输⼊验证码"
         :rules="userFormRules.code"
         type="number"
@@ -33,10 +33,23 @@
         >
         <i slot="left-icon" class="toutiao toutiao-yanzhengma"></i>
         <template #button>
-            <van-button 
-            class="send-sms-btn" 
+            <!-- 
+                time: 倒计时时长 
+            -->
+            <van-count-down
+            v-if="isCountDownShow" 
+            :time="1000*10" 
+            format="ss s"
+            @finish="isCountDownShow = false"
+            />
+            <van-button
+            v-else 
+            class="send-sms-btn"
+            native-type="button" 
             round size="small" 
-            type="default">
+            type="default"
+            @click="onSendSms"
+            >
             发送验证码
             </van-button>
         </template>
@@ -80,9 +93,10 @@
                 pattern: /^\d{6}$/,
                 message: '验证码格式错误'
             }]
-        }
-     }
-     },
+        },
+        isCountDownShow: false //是否展示倒计时
+    }
+    },
     computed: {},
     watch: {},
     created () {},
@@ -98,7 +112,7 @@
                 message: '登录中...', 
                 forbidClick: true, //禁用背景点击
                 duration:0 //持续时间，默认是2000
-            });
+            })
 
             //3.提交表单请求登录
             try {
@@ -113,7 +127,22 @@
                 }
             }
             // 4.请求响应结果后续操作
-     }
+        },
+
+        async onSendSms () {
+            console.log('onSendSms')
+            // 1. 校验手机号
+            try {
+                await this.$refs.loginForm.validate('mobile')
+                console.log('验证通过')
+            } catch (err) {
+                return console.log('验证失败', err) //失败过后不继续执行后续代码
+            }
+
+            // 2. 验证通过，显示倒计时
+            this.isCountDownShow = true
+
+        }
      }
     }
 </script>
