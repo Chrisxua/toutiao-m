@@ -4,23 +4,34 @@
     <van-nav-bar title="登录" />
     <!-- /导航栏 -->
     <!-- 登录表单 -->
+    <!--
+      表单验证：
+        1、给 van-field 组件配置 rules 验证规则
+          参考文档：https://youzan.github.io/vant/#/zh-CN/form#rule-shu-ju-jie-gou
+        2、当表单提交的时候会自动触发表单验证
+           如果验证通过，会触发 submit 事件
+           如果验证失败，不会触发 submit
+     -->
     <van-form @submit="onSubmit">
-
         <van-field
         v-model="user.mobile"
         name="⽤户名"
         placeholder="请输⼊⼿机号"
+        :rules="userFormRules.mobile"
+        type="number"
+        maxlength="11"
         >
         <i slot="left-icon" class="toutiao toutiao-shouji"></i>        
         </van-field>
-
         <van-field
         v-model="user.code"
         name="验证码"
         placeholder="请输⼊验证码"
+        :rules="userFormRules.code"
+        type="number"
+        maxlength="6"
         >
         <i slot="left-icon" class="toutiao toutiao-yanzhengma"></i>
-
         <template #button>
             <van-button 
             class="send-sms-btn" 
@@ -30,11 +41,10 @@
             </van-button>
         </template>
         </van-field>
-
         <div class="login-btn-wrap">
-        <van-button class="login-btn" block type="info" native-type="submit">
-        登录
-        </van-button>
+            <van-button class="login-btn" block type="info" native-type="submit">
+            登录
+            </van-button>
         </div>
     </van-form>
     <!-- /登录表单 -->
@@ -54,6 +64,22 @@
         user: {
             mobile:'',//手机号
             code:''//验证码
+        },
+        userFormRules: {
+            mobile: [{
+                required: true,
+                message: '手机号不能为空',
+            },{
+                pattern: /^1[3|5|7|8]\d{9}$/,
+                message: '手机号格式错误'
+            }],
+            code: [{
+                required: true,
+                message: '验证码不能为空',
+            },{
+                pattern: /^\d{6}$/,
+                message: '验证码格式错误'
+            }]
         }
      }
      },
